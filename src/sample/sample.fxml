@@ -3,6 +3,79 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
 <GridPane fx:controller="sample.Controller"
-          xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">
+          fx:id="game"
+          xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10"
+          maxHeight="Infinity" maxWidth="Infinity">
+
+    <GridPane fx:id="boardPlan"
+              GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="12" GridPane.columnSpan="9"
+              GridPane.hgrow="always" GridPane.vgrow="always"
+              alignment="center">
+
+        <GridPane   fx:id="board"
+                    GridPane.columnIndex="1" GridPane.rowIndex="0"
+                    GridPane.columnSpan="8" GridPane.rowSpan="8"/>
+
+        <VBox   GridPane.columnIndex="0" GridPane.rowIndex="0"
+                GridPane.rowSpan="8"
+                spacing="84" alignment="center">
+            <Label text="8"/>
+            <Label text="7"/>
+            <Label text="6"/>
+            <Label text="5"/>
+            <Label text="4"/>
+            <Label text="3"/>
+            <Label text="2"/>
+            <Label text="1"/>
+        </VBox>
+
+        <HBox   GridPane.columnIndex="1" GridPane.rowIndex="14"
+                GridPane.columnSpan="8"
+                spacing="92.5" alignment="center">
+            <Label text="A"/>
+            <Label text="B"/>
+            <Label text="C"/>
+            <Label text="D"/>
+            <Label text="E"/>
+            <Label text="F"/>
+            <Label text="G"/>
+            <Label text="H"/>
+        </HBox>
+    </GridPane>
+
+    <VBox   fx:id="movesList"
+            GridPane.columnIndex="10" GridPane.rowIndex="0"
+            GridPane.columnSpan="2" GridPane.rowSpan="8"
+            alignment="center"
+            GridPane.hgrow="always" GridPane.vgrow="always">
+        <Label text="Moves"/>
+        <ListView />
+    </VBox>
+
+    <HBox fx:id="playingControlButtoms"
+              GridPane.columnIndex="10" GridPane.rowIndex="10"
+
+          alignment="center">
+        <Button text="Step back"/>
+        <Button text="Pause/Play"/>
+        <Button text="Step forward"/>
+    </HBox>
+
+    <HBox fx:id="playOption"
+              GridPane.columnIndex="10" GridPane.rowIndex="11"
+
+          alignment="center">
+        <RadioButton text="Automatic"/>
+        <RadioButton text="Manual"/>
+    </HBox>
+
+
 </GridPane>
