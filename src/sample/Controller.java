@@ -1,43 +1,157 @@
 package sample;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.event.ActionEvent;
+import javafx.scene.text.Text;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Controller {
 
-    @FXML
-    private GridPane board ;
-    @FXML
-    private GridPane game ;
-    //private List<Button> fields ;
+    // todo definovat triedu samotnej hry
+    // bude musiet byt vytvoreny konstruktor v src
+    // -- s parametrom suboru
+    // -- s bez parametra ... cista hra
+
+    private int actualMove = 0; // 0 je vzdy inicializacia dosky
+    private List<Button> fieldList = new ArrayList<>();;
+
+
+    // fxml elements
+    @FXML private ListView<String> moveList;
+    @FXML private GridPane board ;
+    @FXML private GridPane game ;
+    @FXML private Text warningBar ;
+
+    // figure pictures
+    private String path = "/figuresimg/";
+
+    private Image w_kral = new Image(getClass().getResourceAsStream(path + "w_kral.png"));
+    private Image w_dama = new Image(getClass().getResourceAsStream(path +"w_dama.png"));
+    private Image w_strelec = new Image(getClass().getResourceAsStream(path +"w_strelec.png"));
+    private Image w_kon = new Image(getClass().getResourceAsStream(path +"w_kon.png"));
+    private Image w_veza = new Image(getClass().getResourceAsStream(path +"w_veza.png"));
+    private Image w_pesiak = new Image(getClass().getResourceAsStream(path +"w_pesiak.png"));
+
+    private Image b_kral = new Image(getClass().getResourceAsStream(path +"b_kral.png"));
+    private Image b_dama = new Image(getClass().getResourceAsStream(path +"b_dama.png"));
+    private Image b_strelec = new Image(getClass().getResourceAsStream(path +"b_strelec.png"));
+    private Image b_kon = new Image(getClass().getResourceAsStream(path +"b_kon.png"));
+    private Image b_veza = new Image(getClass().getResourceAsStream(path +"b_veza.png"));
+    private Image b_pesiak = new Image(getClass().getResourceAsStream(path +"b_pesiak.png"));
+
+
+    @FXML protected void loadGame(ActionEvent event) {
+
+        // todo metoda na nacitanie dat do ObservableList<String>
+        /* priklad */
+        ObservableList<String> move = FXCollections.observableArrayList("1. h4 e6", "2. e4 Be7", "3. Rh3 h5 ", "4. Bc4 Nf6");
+        for (String o : move) {
+            moveList.getItems().add(o);
+        }
+        moveList.getSelectionModel().select(actualMove);
+
+        //todo rozmiestnenie figurok
+        //zavolanie konstruktoru s parametrom suboru
+        //inicializovanie gui dosky
+        updateBoard();
+    }
+
+
+
+    @FXML protected void nextMove(ActionEvent event) {
+        actualMove++;
+        String rawNextMove = moveList.getItems().get(actualMove);
+
+        // todo parsing nextmove
+        String destCoord = rawNextMove;
+
+        if (true/*move(destCoord[0], destCoord[1])*/) {
+            moveList.getSelectionModel().select(actualMove);
+            updateBoard();
+        }
+        else {
+            warningBar.setText("Non-valid move");
+            actualMove--;
+            // todo zablokovat tlacitka???
+        }
+    }
+
+    @FXML protected void previousMove(ActionEvent event) {
+        if (actualMove > 0) {
+            actualMove--;
+            String rawNextMove = moveList.getItems().get(actualMove);
+
+            // todo parsing nextmove
+            String destCoord = rawNextMove;
+
+            if (true/*move(destCoord[0], destCoord[1])*/) {
+                moveList.getSelectionModel().select(actualMove);
+                updateBoard();
+            }
+            else {
+                warningBar.setText("Non-valid move");
+                actualMove++;
+                // todo zablokovat tlacitka???
+            }
+        }
+    }
+
+    protected void updateBoard() {
+        int butIdx = 0;
+/*
+        for (cez vsetky polia) {
+
+            Button actButton = fieldList.get(butIdx);
+            switch (nazov postavy) {
+                case Type.K:
+                    if (figure.isWhite()) actButton.setGraphic(new ImageView(w_kral));
+                    else actButton.setGraphic(new ImageView(b_kral));
+                    break;
+                case Type.D:
+                    if (figure.isWhite()) actButton.setGraphic(new ImageView(w_dama));
+                    else actButton.setGraphic(new ImageView(b_dama));
+                    break;
+                case Type.V:
+                    if (figure.isWhite()) actButton.setGraphic(new ImageView(w_veza));
+                    else actButton.setGraphic(new ImageView(b_veza));
+                    break;
+                case Type.J:
+                    if (figure.isWhite()) actButton.setGraphic(new ImageView(w_kon));
+                    else actButton.setGraphic(new ImageView(b_kon));
+                    break;
+                case Type.S:
+                    if (figure.isWhite()) actButton.setGraphic(new ImageView(w_strelec));
+                    else actButton.setGraphic(new ImageView(b_strelec));
+                    break;
+                case Type.P:
+                    if (figure.isWhite()) actButton.setGraphic(new ImageView(w_pesiak));
+                    else actButton.setGraphic(new ImageView(b_pesiak));
+                    break;
+                deafult:
+                    actButton.setGraphic(null);
+                    break;
+            }
+            butIdx++;
+        }*/
+    }
+
+
+
 
     public void initialize() {
-        //fields = new ArrayList<>();
-        String path = "/figuresimg/";
-
-        Image w_kral = new Image(getClass().getResourceAsStream(path + "w_kral.png"));
-        Image w_dama = new Image(getClass().getResourceAsStream(path +"w_dama.png"));
-        Image w_strelec = new Image(getClass().getResourceAsStream(path +"w_strelec.png"));
-        Image w_kon = new Image(getClass().getResourceAsStream(path +"w_kon.png"));
-        Image w_veza = new Image(getClass().getResourceAsStream(path +"w_veza.png"));
-        Image w_pesiak = new Image(getClass().getResourceAsStream(path +"w_pesiak.png"));
-
-        Image b_kral = new Image(getClass().getResourceAsStream(path +"b_kral.png"));
-        Image b_dama = new Image(getClass().getResourceAsStream(path +"b_dama.png"));
-        Image b_strelec = new Image(getClass().getResourceAsStream(path +"b_strelec.png"));
-        Image b_kon = new Image(getClass().getResourceAsStream(path +"b_kon.png"));
-        Image b_veza = new Image(getClass().getResourceAsStream(path +"b_veza.png"));
-        Image b_pesiak = new Image(getClass().getResourceAsStream(path +"b_pesiak.png"));
-
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 Button button = new Button();
@@ -92,7 +206,7 @@ public class Controller {
                     }
                 }
 
-                //fields.add(button);
+                fieldList.add(button);
                 board.getChildren().add(button);
 
                 //ColumnConstraints column1 = new ColumnConstraints();
@@ -107,6 +221,8 @@ public class Controller {
         column2.setPercentWidth(30);
         game.getColumnConstraints().addAll(column1, column2); // each get 50% of width*/
     }
+
+
 
 
 

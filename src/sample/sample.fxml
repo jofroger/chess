@@ -51,27 +51,43 @@
         </HBox>
     </GridPane>
 
-    <VBox   fx:id="movesList"
+
+    <VBox   fx:id="movelistBar"
             GridPane.columnIndex="10" GridPane.rowIndex="0"
             GridPane.columnSpan="2" GridPane.rowSpan="8"
             alignment="center"
             GridPane.hgrow="always" GridPane.vgrow="always">
         <Label text="Moves"/>
-        <ListView />
+        <ListView fx:id="moveList"/>
     </VBox>
 
-    <HBox fx:id="playingControlButtoms"
-              GridPane.columnIndex="10" GridPane.rowIndex="10"
+    <Text fx:id="warningBar"
+          GridPane.columnIndex="10" GridPane.rowIndex="8"
+          GridPane.columnSpan="2"/>
 
+    <HBox fx:id="loadingBar"
+          GridPane.columnIndex="10" GridPane.rowIndex="9"
+          GridPane.columnSpan="2"
+          spacing="25"
           alignment="center">
-        <Button text="Step back"/>
-        <Button text="Pause/Play"/>
-        <Button text="Step forward"/>
+        <Button text="Load game" onAction="#loadGame"/>
+        <Button text="Start new game"/>
     </HBox>
 
-    <HBox fx:id="playOption"
-              GridPane.columnIndex="10" GridPane.rowIndex="11"
+    <HBox fx:id="controlBar"
+          GridPane.columnIndex="10" GridPane.rowIndex="10"
+          GridPane.columnSpan="2"
+          spacing="10"
+          alignment="center">
+        <Button text="Step back" onAction="#previousMove"/>
+        <Button text="Pause/Play"/>
+        <Button text="Step forward" onAction="#nextMove"/>
+    </HBox>
 
+    <HBox fx:id="optionBar"
+          GridPane.columnIndex="10" GridPane.rowIndex="11"
+          GridPane.columnSpan="2"
+          spacing="25"
           alignment="center">
         <RadioButton text="Automatic"/>
         <RadioButton text="Manual"/>
