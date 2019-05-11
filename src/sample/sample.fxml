@@ -58,7 +58,7 @@
             alignment="center"
             GridPane.hgrow="always" GridPane.vgrow="always">
         <Label text="Moves"/>
-        <ListView fx:id="moveList"/>
+        <ListView fx:id="moveList" onMouseClicked="#handleMouseClick"/>
     </VBox>
 
     <Text fx:id="warningBar"
@@ -72,6 +72,7 @@
           alignment="center">
         <Button text="Load game" onAction="#loadGame"/>
         <Button text="Start new game"/>
+        <Button text="Restart" onAction="#restartGame"/>
     </HBox>
 
     <HBox fx:id="controlBar"
@@ -80,7 +81,7 @@
           spacing="10"
           alignment="center">
         <Button text="Step back" onAction="#previousMove"/>
-        <Button text="Pause/Play"/>
+        <Button fx:id="pauseOrPlay" onAction="#setPauseOrPlay"/>
         <Button text="Step forward" onAction="#nextMove"/>
     </HBox>
 
@@ -89,8 +90,8 @@
           GridPane.columnSpan="2"
           spacing="25"
           alignment="center">
-        <RadioButton text="Automatic"/>
-        <RadioButton text="Manual"/>
+        <RadioButton fx:id="playAutomaticaly" text="Automatic" onAction="#playGameAutomatically"/>
+        <RadioButton fx:id="playManualy" text="Manual"/>
     </HBox>
 
 
