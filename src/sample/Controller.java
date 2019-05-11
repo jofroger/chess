@@ -1,51 +1,45 @@
 package sample;
 
-import ija.ija2018.homework2.common.Field;
-import ija.ija2018.homework2.common.Figure;
 import ija.ija2018.homework2.game.Board;
 import ija.ija2018.homework2.game.BoardField;
 import ija.ija2018.homework2.game.Disk;
 import ija.ija2018.homework2.game.Game;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.event.ActionEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 
-import java.lang.reflect.Array;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static ija.ija2018.homework2.GameFactory.createChessGame;
 import static ija.ija2018.homework2.common.Figure.*;
-import static java.lang.Thread.sleep;
 
 
 public class Controller {
-
-    // todo definovat triedu samotnej hry
-    // bude musiet byt vytvoreny konstruktor v src
-    // -- s parametrom suboru
-    // -- s bez parametra ... cista hra
-    // pri nacitani sa overi format zapisu a prevedie do zlozitej podoby
-    Game chessGame; // na inicializovanie sa musi hra najprv nacitat
+    private Game chessGame; // na inicializovanie sa musi hra najprv nacitat
 
     private int actualMove = -1; // 0 je vzdy inicializacia dosky
-    private List<Button> fieldList = new ArrayList<>();;
+    private List<Button> fieldList = new ArrayList<>();
     private boolean paused = false;
-    private List<String> moveListColors = new ArrayList<String>();
+    private List<String> moveListColors = new ArrayList<>();
+    private int tabCnt = 2;
 
     // fxml elements
     @FXML private ListView<String> moveList;
@@ -54,6 +48,10 @@ public class Controller {
     @FXML private RadioButton playAutomaticaly ;
     @FXML private RadioButton playManualy ;
     @FXML private Button pauseOrPlay;
+    @FXML private TextField delay;
+    @FXML private TabPane root;
+    @FXML private Tab baseTab;
+
 
 
 
@@ -88,14 +86,13 @@ public class Controller {
         return Arrays.asList(splitStr[1], splitStr[2]);      // chceme to bez poradovaho cisla
     }
 
-    @FXML protected void loadGame(ActionEvent event) {
+    @FXML protected void loadGame() {
 
         // todo metoda na nacitanie dat do ObservableList<String>
         /* priklad */
         ObservableList<String> moves = FXCollections.observableArrayList("1. h2h4 e7e6", "2. e2e4 e6e5", "3. Vh1h3 d7d6 ", "4. Sf1c4 Jb8c6");
         for (String move : moves) {
             moveList.getItems().add(move);
-            List<String> list = divByColor(move);
             moveListColors.addAll(divByColor(move));
         }
         moveList.getSelectionModel().select(actualMove);
@@ -106,7 +103,7 @@ public class Controller {
     }
 
 
-    protected int charToIntRow(char row) {
+    private int charToIntRow(char row) {
         switch (row) {
             case 'a':
                 return 1;
@@ -130,7 +127,31 @@ public class Controller {
         }
     }
 
-    protected Pair<Disk, BoardField> getFigureAndFieldFromMove(String move, boolean isWhite) {
+    private char intToCharRow(int row) {
+        switch (row) {
+            case 1:
+                return 'a';
+            case 2:
+                return 'b';
+            case 3:
+                return 'c';
+            case 4:
+                return 'd';
+            case 5:
+                return 'e';
+            case 6:
+                return 'f';
+            case 7:
+                return 'g';
+            case 8:
+                return 'h';
+            default:
+                warningBar.setText("ERROR Move: wrong format");
+                return 'X';
+        }
+    }
+
+    private Pair<Disk, BoardField> getFigureAndFieldFromMove(String move, boolean isWhite) {
         Type figureType;
         int srcCol, srcRow, destCol, destRow;
         // todo osetrit este dalsie vlastnosti ako sach, mat ...
@@ -186,65 +207,79 @@ public class Controller {
 
         BoardField destField = chessGame.getBoard().getField(destCol, destRow);     //todo cisla poli musia byt skontrolovane pri nacitani
 
-        return new Pair<Disk, BoardField>(figureToMove, destField);
+        return new Pair<>(figureToMove, destField);
     }
 
 
-    @FXML protected void nextMove(ActionEvent event) {
-        actualMove++;
-        String rawNextMove = moveList.getItems().get(actualMove / 2);   // moveList obsahuje cierneho a bieleho tahy spolocne
+    @FXML protected void nextMove() {
+        if (actualMove < moveListColors.size() - 1) {   // pocitanie sa zacina od -1
+            actualMove++;
 
-        Pair<Disk, BoardField> figureAndField = getFigureAndFieldFromMove(moveListColors.get(actualMove), actualMove % 2 == 0); // kazdy parny tah ide biely
+            Pair<Disk, BoardField> figureAndField = getFigureAndFieldFromMove(moveListColors.get(actualMove), actualMove % 2 == 0); // kazdy parny tah ide biely
 
-        if (chessGame.move(figureAndField.getKey(), figureAndField.getValue())) {   // key = Disk, value = Boardfield
-            moveList.getSelectionModel().select(actualMove/2);
-            updateBoard();
+            if (chessGame.move(figureAndField.getKey(), figureAndField.getValue())) {   // key = Disk, value = Boardfield
+                moveList.getSelectionModel().select(actualMove / 2);
+                updateBoard();
+            } else {
+                warningBar.setText("Non-valid move");
+                actualMove--;
+                // todo zablokovat tlacitka???
+            }
         }
-        else {
-            warningBar.setText("Non-valid move");
+    }
+
+    @FXML protected void previousMove() {
+        if (actualMove >= 0) {
             actualMove--;
-            // todo zablokovat tlacitka???
-        }
-    }
-
-    @FXML protected void previousMove(ActionEvent event) {
-        if (actualMove > 0) {
             chessGame.undo();
-            actualMove--;
             moveList.getSelectionModel().select(actualMove/2);
             updateBoard();
         }
     }
 
     // change move by clicking to item in listview
-    @FXML public void handleMouseClick(MouseEvent arg0) {
-        actualMove = moveList.getSelectionModel().getSelectedIndex();
-        actualMove--;
-        nextMove(null);
+    // todo praca s moveList je vzdy nieco s dvojkou, poznacit v dokumentacii
+    @FXML public void handleMouseClick() {
+        int destMove = moveList.getSelectionModel().getSelectedIndex() * 2;
+
+        if (actualMove < destMove) {
+            while (actualMove < destMove) nextMove();      // aktualizacia prebieha v nextMove a previousMove
+        } else {
+            while (actualMove > destMove) previousMove();
+        }
     }
 
-    @FXML protected void restartGame(ActionEvent event) {
+
+
+    @FXML protected void restartGame() {
         actualMove = 0;
         moveList.getSelectionModel().select(actualMove);
 
-        // for () game.undo(); alebo inak zavisi od funkcie
+        for (;actualMove <= 0; actualMove--) chessGame.undo();
         updateBoard();
     }
 
-    @FXML protected void playGameAutomatically(ActionEvent event) throws InterruptedException {
-        //while (true) {
-            for (int i = 0; i < 4; i++) {
-                if (!paused) {
-                    nextMove(null);
-                    sleep(2000);
+    @FXML protected void playGameAutomatically() {
+        Task task = new Task<Void>() {
+            @Override
+            public Void call() throws InterruptedException {
+                while (actualMove < moveListColors.size()) {
+                    if (!paused) {
+                        Platform.runLater(() -> nextMove());
+                        Thread.sleep(Long.valueOf(delay.getText()));
+                    }
                 }
+                return null;
             }
-        //}
+        };
+        new Thread(task).start();
     }
 
+    protected void playerMove() {
 
+    }
 
-    protected int getInvertedRow(int row) {
+    private int getInvertedRow(int row) {
         switch (row) {
             case 1:
                 return 8;
@@ -267,12 +302,12 @@ public class Controller {
         }
     }
 
-    protected void updateField(Button button, Disk figure, Image wFigureImg, Image bFigureImg) {
+    private void updateField(Button button, Disk figure, Image wFigureImg, Image bFigureImg) {
         if (figure.isWhite()) button.setGraphic(new ImageView(wFigureImg));
         else button.setGraphic(new ImageView(bFigureImg));
     }
 
-    protected void updateBoard() {
+    private void updateBoard() {
         Board board = chessGame.getBoard();
         int butIdx = 0;
         int boardSize = board.getSize();
@@ -311,22 +346,83 @@ public class Controller {
         }
     }
 
-    @FXML protected void setPauseOrPlay(ActionEvent event) {
+    @FXML protected void setPauseOrPlay() {
         if (paused) pauseOrPlay.setGraphic(new ImageView(pauseIcon));
         else  pauseOrPlay.setGraphic(new ImageView(playIcon));
 
         paused = !paused;   // obrati hodnotu
     }
-/*
-    @FXML protected void addNewTab(ActionEvent event) {
 
-        TabPane tabPane = new TabPane();
-        Tab tab = new Tab();
-        tab.setText("new tab");
-        tab.setContent(new Rectangle(200, 200, Color.LIGHTSTEELBLUE));
-        tabPane.getTabs().add(tab);
+    @FXML protected void addNewTab() throws IOException {
+        TabPane pane = FXMLLoader.load(this.getClass().getResource("sample.fxml"));
+
+        Tab newTab = new Tab("Game " + tabCnt);
+        newTab.setContent(pane.getTabs().get(0).getContent());
+        root.getTabs().addAll(newTab);
+
+        tabCnt++;
     }
-*/
+
+    private boolean canDoMove = false;
+    private int srcCol;
+    private int srcRow;
+    private char srcColChar;
+    private Button selectedField;
+
+    private void playerMove(Button field) {
+        String coord = field.getAccessibleText();
+        if (canDoMove) {
+            int destCol = Character.getNumericValue(coord.charAt(0));
+            int destRow = getInvertedRow(Character.getNumericValue(coord.charAt(1)));
+            char dstColChar = intToCharRow(destCol);
+
+            Disk actFigure = chessGame.getBoard().getField(srcCol, srcRow).get();
+            if (actFigure != null) {
+                actualMove++;
+                BoardField destField = chessGame.getBoard().getField(destCol, destRow);
+
+                String moveNonation = "" + (actFigure.getTyp() == Type.P ? "" : actFigure.getTyp()) + srcColChar + srcRow + dstColChar + destRow;
+                if (actFigure.isWhite()) moveNonation = "" + ((actualMove / 2) + 1) + ". " + moveNonation + " ";
+
+                if (chessGame.move(actFigure, destField)) {
+                    if (actFigure.isWhite()) moveList.getItems().add(actualMove / 2, moveNonation);
+                    else {
+                        String record = moveList.getItems().get(actualMove / 2);
+                        moveList.getItems().remove(actualMove / 2);
+                        record = record + moveNonation;
+                        moveList.getItems().add(actualMove / 2, record);
+                    }
+
+                    moveList.getSelectionModel().select(actualMove / 2);
+                    updateBoard();
+                    canDoMove = !canDoMove;
+                } else {
+                    warningBar.setText("Non-valid move");
+                    actualMove--;
+                }
+            }
+        }
+        else {
+            srcCol = Character.getNumericValue(coord.charAt(0));
+            srcRow = getInvertedRow(Character.getNumericValue(coord.charAt(1)));
+            srcColChar = intToCharRow(srcCol);
+
+            Disk figureForCheck = chessGame.getBoard().getField(srcCol, srcRow).get();
+            if (figureForCheck != null) {
+                if ((( (actualMove + 1) % 2) == 0) && !figureForCheck.isWhite()) {
+                    warningBar.setText("It is White's turn");
+                    return;
+                }
+                if ((( (actualMove + 1) % 2) == 1) && figureForCheck.isWhite()) {
+                    warningBar.setText("It is Black's turn");
+                    return;
+                }
+                delay.setText("" + srcColChar + srcRow);
+                canDoMove = !canDoMove;
+            }
+        }
+    }
+
 
         public void initialize() {
             chessGame = createChessGame(new Board(8));  // create normal chess game
@@ -339,8 +435,7 @@ public class Controller {
             playManualy.setSelected(true);  // turn on by default
 
             // set to paused
-            setPauseOrPlay(null);
-
+            setPauseOrPlay();
 
             // init board buttons
             for (int x = 0; x < 8; x++) {
@@ -354,7 +449,12 @@ public class Controller {
                     button.setBackground(new Background(new BackgroundFill(fieldColor, CornerRadii.EMPTY, Insets.EMPTY)));
                     button.setMinWidth(100);
                     button.setMinHeight(100);
-
+                    button.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override public void handle(ActionEvent e) {
+                            playerMove(button);
+                        }
+                    });
+                    button.setAccessibleText(""+ (y+1) + (x+1));
                     fieldList.add(button);
                     board.getChildren().add(button);
 
