@@ -1,6 +1,7 @@
 package ija.ija2018.homework2.game;
 
 import ija.ija2018.homework2.common.Field;
+import ija.ija2018.homework2.common.Figure;
 
 public class Pesec extends Disk{
 
@@ -37,7 +38,9 @@ public class Pesec extends Disk{
         Disk pesec = game.getBoard().getField(Game.aktualField.getCol(), Game.aktualField.getRow()).get();
 
         int k = pesec.getColor().equals(Color.W)?0:3;
-//        boolean twoSteps;
+        int twoSteps = pesec.getColor().equals(Color.W)?2:7;
+
+        Game.sach = false;
 
         for (int i = k; i < k+3; i++) {
             Field aktualField = Game.aktualField;
@@ -50,12 +53,30 @@ public class Pesec extends Disk{
                 else {
 //                    if (!dirsField.isEmpty() && Game.destField.equals(dirsField)) {
                     if ( Game.destField.equals(dirsField)) {
-                        if (!dirsField.isEmpty()) return dirsField.get().getColor().equals(Game.aktualField.get().getColor()) ? false : true;  //ak rovnaka farba tak FALSE
-                        else return true;
+                        if (!dirsField.isEmpty()) {
+                            //pole NIE je prazdne
+                            if (i != 0 && i != 3) {             // ide do boku
+                                if (dirsField.get().getColor().equals(Game.aktualField.get().getColor())) return false; //ak rovnaka farba tak FALSE
+//                                else return true;
+                                else {
+                                    if (dirsField.get().getTyp().equals(Figure.Type.K)) {
+                                        Game.sach = true;
+                                        return false;
+                                    }else return true;
+                                }
+
+                            }else return false;                 // ide priamo
+
+                        }else {
+                            //pole JE prazdne
+                            if (i != 0 && i != 3) return false; // ide do boku
+                            else return true;                   // ide priamo
+                        }
                     }
                     aktualField = dirsField;
                     if (!dirsField.isEmpty()) break; // v ceste je figurka
-                    if (i != 0 && i != 3) break;     // umozni dva kroky pesiaka
+//                    if (i != 0 && i != 3) break;     // umozni dva kroky pesiaka
+                    if (Game.aktualField.getRow() != twoSteps) break;     // umozni dva kroky pesiaka
                 }
             }
         }

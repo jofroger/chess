@@ -20,6 +20,7 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
     static Field aktualField;
     private String gameName;
     static Field prevAktualField;
+    static boolean sach;
 
     //Methods
 
