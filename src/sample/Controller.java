@@ -25,11 +25,12 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static ija.ija2018.homework2.GameFactory.createChessGame;
 import static ija.ija2018.homework2.common.Figure.*;
@@ -89,19 +90,31 @@ public class Controller {
         return Arrays.asList(splitStr[1], splitStr[2]);      // chceme to bez poradovaho cisla
     }
 
-    @FXML protected void loadGame() {
+    @FXML protected void loadGame() throws IOException {
 
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showOpenDialog(root.getScene().getWindow());
 
+        BufferedReader in;
+        in = new BufferedReader(new FileReader(selectedFile));
+        String line = in.readLine();
+        while (line != null) {
+            moveList.getItems().add(line);
+            moveListColors.addAll(divByColor(line));
+            line = in.readLine();
+        }
+
+
+
+
         // todo metoda na nacitanie dat do ObservableList<String>
         /* priklad */
-        ObservableList<String> moves = FXCollections.observableArrayList("1. h2h4 e7e6", "2. e2e4 e6e5", "3. Vh1h3 d7d6 ", "4. Sf1c4 Jb8c6");
+        /*ObservableList<String> moves = FXCollections.observableArrayList("1. h2h4 e7e6", "2. e2e4 e6e5", "3. Vh1h3 d7d6 ", "4. Sf1c4 Jb8c6");
 
         for (String move : moves) {
             moveList.getItems().add(move);
             moveListColors.addAll(divByColor(move));
-        }
+        }*/
         moveList.getSelectionModel().select(actualMove);
 
         // rozmiestnenie figurok
