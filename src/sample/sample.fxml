@@ -64,62 +64,69 @@
                     GridPane.columnIndex="10" GridPane.rowIndex="1"
                     GridPane.columnSpan="2" GridPane.rowSpan="9"
                     alignment="TOP_CENTER"
+                    spacing="30"
                     GridPane.hgrow="always" GridPane.vgrow="always">
 
-                <Label text="Moves"/>
-                <ListView fx:id="moveList" onMouseClicked="#handleMouseClick"/>
+                <VBox   spacing="10"
+                        alignment="CENTER">
+                    <Label text="Moves"/>
+                    <ListView fx:id="moveList" onMouseClicked="#handleMouseClick"/>
 
-                <HBox fx:id="loadingBar"
-                      spacing="25"
-                      alignment="center">
-                    <Button text="Load game" onAction="#loadGame"/>
-                    <Button text="Save game"/>
-                    <Button text="Restart game" onAction="#restartGame"/>
-                </HBox>
+                    <HBox fx:id="loadingBar"
+                          spacing="15"
+                          alignment="center">
+                        <Button text="Load game" onAction="#loadGame"/>
+                        <Button text="Save game" onAction="#saveGame"/>
+                        <Button text="Restart game" onAction="#restartGame"/>
+                    </HBox>
+                </VBox>
 
                 <Text fx:id="warningBar"/>
 
-                <Label text="Loaded game Playback"/>
-                <HBox fx:id="controlBar"
-                      spacing="10"
-                      alignment="center">
-                    <Button text="Step back" onAction="#previousMove"/>
-                    <Button fx:id="pauseOrPlay" onAction="#setPauseOrPlay"/>
-                    <Button text="Step forward" onAction="#nextMove"/>
-                </HBox>
+                <VBox   spacing="10"
+                        alignment="CENTER">
+                    <Label text="Loaded game Playback"/>
+                    <HBox fx:id="controlBar"
+                          spacing="10"
+                          alignment="center">
+                        <Button text="Step back" onAction="#previousMove"/>
+                        <Button fx:id="pauseOrPlay" onAction="#setPauseOrPlay"/>
+                        <Button text="Step forward" onAction="#nextMove"/>
+                    </HBox>
 
-                <HBox fx:id="optionBar"
-                      spacing="25"
-                      alignment="center">
-                    <RadioButton fx:id="playAutomaticaly" text="Automatic" onAction="#playGameAutomatically"/>
-                    <RadioButton fx:id="playManualy" text="Manual"/>
-                </HBox>
+                    <HBox fx:id="optionBar"
+                          spacing="25"
+                          alignment="center">
+                        <RadioButton fx:id="playAutomaticaly" text="Automatic" onAction="#playGameAutomatically"/>
+                        <RadioButton fx:id="playManualy" text="Manual"/>
+                    </HBox>
 
-                <HBox>
-                    <Text text="Delay"/>
-                    <TextField  fx:id="delay" maxWidth="100"
-                                text="2000"/>
-                    <Text text="(ms)"/>
-                </HBox>
+                    <HBox   spacing="10">
+                        <Text text="Delay"/>
+                        <TextField  fx:id="delay" maxWidth="75"
+                                    text="2000"/>
+                        <Text text="(ms)"/>
+                    </HBox>
+                </VBox>
 
-
-                <Text text="User's game Playback"/>
-                <VBox>
+                <VBox   spacing="10"
+                        alignment="CENTER">
+                    <Text text="User's game Playback"/>
                     <HBox   spacing="25"
                             alignment="center">
                         <Button text="Undo" onAction="#previousMove"/>
                         <Button text="Redo" onAction="#nextMove"/>
                     </HBox>
-                    <HBox
+                    <HBox   spacing="10"
                             alignment="center">
                         <Text text="Selected position"/>
-                        <TextField  fx:id="showPosition" maxWidth="100"
+                        <TextField  fx:id="showPosition" maxWidth="50"
                                     text="None"/>
                         <Button text="Reset position" onAction="#resetPosition"/>
                     </HBox>
                 </VBox>
-            </VBox>
 
+            </VBox>
         </GridPane>
     </Tab>
 </TabPane>

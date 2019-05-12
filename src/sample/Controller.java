@@ -22,8 +22,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.util.Pair;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,9 +91,13 @@ public class Controller {
 
     @FXML protected void loadGame() {
 
+        FileChooser fileChooser = new FileChooser();
+        File selectedFile = fileChooser.showOpenDialog(root.getScene().getWindow());
+
         // todo metoda na nacitanie dat do ObservableList<String>
         /* priklad */
         ObservableList<String> moves = FXCollections.observableArrayList("1. h2h4 e7e6", "2. e2e4 e6e5", "3. Vh1h3 d7d6 ", "4. Sf1c4 Jb8c6");
+
         for (String move : moves) {
             moveList.getItems().add(move);
             moveListColors.addAll(divByColor(move));
@@ -103,6 +109,10 @@ public class Controller {
         updateBoard();
     }
 
+    @FXML protected void saveGame() {
+        FileChooser fileChooser = new FileChooser();
+        File selectedFile = fileChooser.showSaveDialog(root.getScene().getWindow());
+    }
 
     private int charToIntRow(char row) {
         switch (row) {
