@@ -62,58 +62,55 @@
 
             <VBox   fx:id="movelistBar"
                     GridPane.columnIndex="10" GridPane.rowIndex="1"
-                    GridPane.columnSpan="2" GridPane.rowSpan="1"
-                    alignment="center"
+                    GridPane.columnSpan="2" GridPane.rowSpan="9"
+                    alignment="TOP_CENTER"
                     GridPane.hgrow="always" GridPane.vgrow="always">
+
                 <Label text="Moves"/>
                 <ListView fx:id="moveList" onMouseClicked="#handleMouseClick"/>
+
+                <HBox fx:id="loadingBar"
+                      spacing="25"
+                      alignment="center">
+                    <Button text="Load game" onAction="#loadGame"/>
+                    <Button text="Save game"/>
+                    <Button text="Restart game" onAction="#restartGame"/>
+                </HBox>
+
+                <Text fx:id="warningBar"/>
+
+                <Label text="Loaded game Playback"/>
+                <HBox fx:id="controlBar"
+                      spacing="10"
+                      alignment="center">
+                    <Button text="Step back" onAction="#previousMove"/>
+                    <Button fx:id="pauseOrPlay" onAction="#setPauseOrPlay"/>
+                    <Button text="Step forward" onAction="#nextMove"/>
+                </HBox>
+
+                <HBox fx:id="optionBar"
+                      spacing="25"
+                      alignment="center">
+                    <RadioButton fx:id="playAutomaticaly" text="Automatic" onAction="#playGameAutomatically"/>
+                    <RadioButton fx:id="playManualy" text="Manual"/>
+                </HBox>
+
+                <HBox>
+                    <Text text="Delay"/>
+                    <TextField  fx:id="delay" maxWidth="100"
+                                text="2000"/>
+                    <Text text="(ms)"/>
+                </HBox>
+
+                <Text text="User's game Playback"/>
+                <HBox   spacing="25"
+                        alignment="center">
+                    <Button text="Undo" onAction="#previousMove"/>
+                    <Button text="Redo" onAction="#nextMove"/>
+
+                </HBox>
             </VBox>
 
-            <Text fx:id="warningBar"
-                  GridPane.columnIndex="10" GridPane.rowIndex="4"
-                  GridPane.columnSpan="2" GridPane.rowSpan="1"/>
-
-            <HBox fx:id="loadingBar"
-                  GridPane.columnIndex="10" GridPane.rowIndex="5"
-                  GridPane.columnSpan="2" GridPane.rowSpan="1"
-                  spacing="25"
-                  alignment="center">
-                <Button text="Load game" onAction="#loadGame"/>
-                <Button text="Start new game"/>
-                <Button text="Restart" onAction="#restartGame"/>
-            </HBox>
-
-            <HBox fx:id="controlBar"
-                  GridPane.columnIndex="10" GridPane.rowIndex="6"
-                  GridPane.columnSpan="2" GridPane.rowSpan="1"
-                  spacing="10"
-                  alignment="center">
-                <Button text="Step back" onAction="#previousMove"/>
-                <Button fx:id="pauseOrPlay" onAction="#setPauseOrPlay"/>
-                <Button text="Step forward" onAction="#nextMove"/>
-            </HBox>
-
-            <HBox fx:id="optionBar"
-                  GridPane.columnIndex="10" GridPane.rowIndex="7"
-                  GridPane.columnSpan="2" GridPane.rowSpan="1"
-                  spacing="25"
-                  alignment="center">
-                <RadioButton fx:id="playAutomaticaly" text="Automatic" onAction="#playGameAutomatically"/>
-                <RadioButton fx:id="playManualy" text="Manual"/>
-            </HBox>
-
-            <VBox   GridPane.columnIndex="10" GridPane.rowIndex="8"
-                    GridPane.columnSpan="1" GridPane.rowSpan="1">
-                <Text text="Delay"/>
-                <TextField  fx:id="delay" maxWidth="100"
-                            text="2000"/>
-                <Text text="(ms)"/>
-            </VBox>
-
-            <GridPane GridPane.columnIndex="0" GridPane.rowIndex="9"
-                        GridPane.columnSpan="11" GridPane.rowSpan="2"/>
-            </GridPane>
+        </GridPane>
     </Tab>
-
-
 </TabPane>

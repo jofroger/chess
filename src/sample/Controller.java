@@ -17,6 +17,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -259,11 +260,20 @@ public class Controller {
         updateBoard();
     }
 
-    @FXML protected void playGameAutomatically() {
+
+    private void play() {
         Task task = new Task<Void>() {
             @Override
             public Void call() throws InterruptedException {
                 while (actualMove < moveListColors.size()) {
+
+                    EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent e) {
+                            setPauseOrPlay();
+                        }
+                    };
+
                     if (!paused) {
                         Platform.runLater(() -> nextMove());
                         Thread.sleep(Long.valueOf(delay.getText()));
@@ -275,9 +285,12 @@ public class Controller {
         new Thread(task).start();
     }
 
-    protected void playerMove() {
 
+    @FXML protected void playGameAutomatically() {
+        if (paused) setPauseOrPlay();
+        play();
     }
+
 
     private int getInvertedRow(int row) {
         switch (row) {
@@ -370,56 +383,74 @@ public class Controller {
     private Button selectedField;
 
     private void playerMove(Button field) {
-        String coord = field.getAccessibleText();
-        if (canDoMove) {
-            int destCol = Character.getNumericValue(coord.charAt(0));
-            int destRow = getInvertedRow(Character.getNumericValue(coord.charAt(1)));
-            char dstColChar = intToCharRow(destCol);
+        if (playAutomaticaly.isSelected() && paused || playManualy.isSelected()) {
+            String coord = field.getAccessibleText();
 
-            Disk actFigure = chessGame.getBoard().getField(srcCol, srcRow).get();
-            if (actFigure != null) {
-                actualMove++;
-                BoardField destField = chessGame.getBoard().getField(destCol, destRow);
+            if (canDoMove) {
+                int destCol = Character.getNumericValue(coord.charAt(0));
+                int destRow = getInvertedRow(Character.getNumericValue(coord.charAt(1)));
+                char dstColChar = intToCharRow(destCol);
 
-                String moveNonation = "" + (actFigure.getTyp() == Type.P ? "" : actFigure.getTyp()) + srcColChar + srcRow + dstColChar + destRow;
-                if (actFigure.isWhite()) moveNonation = "" + ((actualMove / 2) + 1) + ". " + moveNonation + " ";
+                Disk actFigure = chessGame.getBoard().getField(srcCol, srcRow).get();
+                if (actFigure != null) {
+                    actualMove++;
+                    BoardField destField = chessGame.getBoard().getField(destCol, destRow);
 
-                if (chessGame.move(actFigure, destField)) {
-                    if (actFigure.isWhite()) moveList.getItems().add(actualMove / 2, moveNonation);
-                    else {
-                        String record = moveList.getItems().get(actualMove / 2);
-                        moveList.getItems().remove(actualMove / 2);
-                        record = record + moveNonation;
-                        moveList.getItems().add(actualMove / 2, record);
+                    String moveNonation = "" + (actFigure.getTyp() == Type.P ? "" : actFigure.getTyp()) + srcColChar + srcRow + dstColChar + destRow;
+                    if (actFigure.isWhite()) moveNonation = "" + ((actualMove / 2) + 1) + ". " + moveNonation + " ";
+
+                    if (chessGame.move(actFigure, destField)) {
+
+                        if (actFigure.isWhite()) {
+                            moveList.getItems().remove(actualMove/2, moveList.getItems().size());
+                            moveList.getItems().add(actualMove / 2, moveNonation);
+                        }
+                        else {
+                            String newRecord;
+
+                            String record = moveList.getItems().get(actualMove / 2);
+                            moveList.getItems().remove(actualMove/2, moveList.getItems().size());
+
+                            String[] splitRec = record.split("\\s+");
+                            if (splitRec.length == 3) {
+                                newRecord = splitRec[0] + " " + splitRec[1] + " " + moveNonation;
+                            }
+                            else {
+                                newRecord = record + moveNonation;
+                            }
+                            moveList.getItems().add(actualMove / 2, newRecord);
+                        }
+
+                        moveList.getSelectionModel().select(actualMove / 2);
+                        updateBoard();
+                        canDoMove = !canDoMove;
+                    } else {
+                        warningBar.setText("Non-valid move");
+                        actualMove--;
                     }
+                }
+            } else {
+                srcCol = Character.getNumericValue(coord.charAt(0));
+                srcRow = getInvertedRow(Character.getNumericValue(coord.charAt(1)));
+                srcColChar = intToCharRow(srcCol);
 
-                    moveList.getSelectionModel().select(actualMove / 2);
-                    updateBoard();
+                Disk figureForCheck = chessGame.getBoard().getField(srcCol, srcRow).get();
+                if (figureForCheck != null) {
+                    if ((((actualMove + 1) % 2) == 0) && !figureForCheck.isWhite()) {
+                        warningBar.setText("It is White's turn");
+                        return;
+                    }
+                    if ((((actualMove + 1) % 2) == 1) && figureForCheck.isWhite()) {
+                        warningBar.setText("It is Black's turn");
+                        return;
+                    }
+                    delay.setText("" + srcColChar + srcRow);
                     canDoMove = !canDoMove;
-                } else {
-                    warningBar.setText("Non-valid move");
-                    actualMove--;
                 }
             }
         }
         else {
-            srcCol = Character.getNumericValue(coord.charAt(0));
-            srcRow = getInvertedRow(Character.getNumericValue(coord.charAt(1)));
-            srcColChar = intToCharRow(srcCol);
-
-            Disk figureForCheck = chessGame.getBoard().getField(srcCol, srcRow).get();
-            if (figureForCheck != null) {
-                if ((( (actualMove + 1) % 2) == 0) && !figureForCheck.isWhite()) {
-                    warningBar.setText("It is White's turn");
-                    return;
-                }
-                if ((( (actualMove + 1) % 2) == 1) && figureForCheck.isWhite()) {
-                    warningBar.setText("It is Black's turn");
-                    return;
-                }
-                delay.setText("" + srcColChar + srcRow);
-                canDoMove = !canDoMove;
-            }
+            warningBar.setText("You can not make moves when Automatic play is not paused");
         }
     }
 
