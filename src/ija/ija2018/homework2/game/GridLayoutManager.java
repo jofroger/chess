@@ -12,8 +12,8 @@ public class GridLayoutManager extends JFrame {
 
     //Components:
     private JButton[][] squares = new JButton[8][8];
-    private JTextField textField = new JTextField();
-    private JButton button = new JButton();
+//    private JTextField textField = new JTextField();
+//    private JButton button = new JButton();
     
     //Colors
         private  Color colorBlack = Color.BLACK;  //Black squares

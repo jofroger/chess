@@ -19,6 +19,7 @@ public class BoardField implements Field, Cloneable {
     private Disk disk;
     private Disk takeDisk;      //vyhodena figurka
     public Field prevField;     //predchadzajuce pole
+    public Field prevAktualField;     //predchadzajuce aktualne pole
 
     //Constructor
     public BoardField(int col, int row){
@@ -167,6 +168,16 @@ public class BoardField implements Field, Cloneable {
     @Override
     public void setPrevField(Field field) {
         this.prevField = field;
+    }
+
+    @Override
+    public Field getPrevAktualField() {
+        return this.prevAktualField;
+    }
+
+    @Override
+    public void setPrevAktualField(Field field) {
+        this.prevAktualField = field;
     }
 
     @Override

@@ -19,6 +19,8 @@ public interface Field {
     int getRow();
     Field getPrevField();
     void  setPrevField(Field field);
+    Field getPrevAktualField();
+    void  setPrevAktualField(Field field);
     Disk  getTakeDisk();
     void  setTakeDisk(Disk disk);
 

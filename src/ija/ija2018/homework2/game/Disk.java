@@ -111,6 +111,8 @@ public class Disk implements Figure, Cloneable {
         try {
             BoardField f = (BoardField) fieldFrom;
             fieldTo.setPrevField((Field) f.clone());
+            f = (BoardField) Game.prevAktualField;
+            if (f!=null)fieldTo.setPrevAktualField((Field) f.clone());
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }

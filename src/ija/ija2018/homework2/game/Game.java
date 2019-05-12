@@ -19,6 +19,7 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
     static Field destField;
     static Field aktualField;
     private String gameName;
+    static Field prevAktualField;
 
     //Methods
 
@@ -64,6 +65,8 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
         }
     }
 
+
+
     @Override
     public int oneStep (String step) {
 
@@ -85,15 +88,15 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
             for (String token : tokens) {
                 f++;
                 if (Character.isUpperCase(token.codePointAt(0))) {
-                   figureTyp = token.substring(0,1);
-                   if (Character.isLowerCase(token.codePointAt(1)))
+                    figureTyp = token.substring(0,1);
+                    if (Character.isLowerCase(token.codePointAt(1)))
                         colAkt = token.codePointAt(1)-96;
-                   if (Character.isDigit(token.codePointAt(2)))
+                    if (Character.isDigit(token.codePointAt(2)))
                         rowAkt = token.codePointAt(2)-48;
 
-                   if (Character.isLowerCase(token.codePointAt(3)))
+                    if (Character.isLowerCase(token.codePointAt(3)))
                         colDest = token.codePointAt(3)-96;
-                   if (Character.isDigit(token.codePointAt(4)))
+                    if (Character.isDigit(token.codePointAt(4)))
                         rowDest = token.codePointAt(4)-48;
 
                 }else {
@@ -123,7 +126,7 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
                     if (!move(figure,field)) return 5;
 
                 }else if (f==1) return 2;
-                      else return 3;
+                else return 3;
 
             }
         } else return 1;
@@ -142,26 +145,34 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
         destField = field;
         if (!figure.moveValidation(field,this)) return false;
 
-        return figure.move(field,board,true);
+//        return figure.move(field,board,true);
+        if (figure.move(field,board,true)) {
+            prevAktualField = aktualField;
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void undo() {
         Disk takeFigure;
         Figure figure;
-        Field fieldPrev, field, takeField;
+        Field fieldPrev, field, takeField, fieldPrevAktual;
 
         takeField = aktualField;
         takeFigure = aktualField.getTakeDisk();
 
         figure = board.getField(aktualField.getCol(), aktualField.getRow()).get();
         fieldPrev = aktualField.getPrevField();
+        fieldPrevAktual = aktualField.getPrevAktualField();
+        if (fieldPrev == null) return;  //neexistuje predchadzajuci tah
         field = board.getField(fieldPrev.getCol(), fieldPrev.getRow());
-        figure.move(field,board,false);
+        if (figure!=null) figure.move(field,board,false);
 
         //come back take disk
         if (takeFigure != null) takeField.put(takeFigure);
         takeField.setTakeDisk(null);          //clear take disk
         takeField.setPrevField(null);         //clear previous field
+        aktualField = fieldPrevAktual;
     }
 }
