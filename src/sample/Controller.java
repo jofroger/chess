@@ -51,7 +51,7 @@ public class Controller {
     @FXML private Button pauseOrPlay;
     @FXML private TextField delay;
     @FXML private TabPane root;
-    @FXML private Tab baseTab;
+    @FXML private TextField showPosition;
 
 
 
@@ -253,11 +253,7 @@ public class Controller {
 
 
     @FXML protected void restartGame() {
-        actualMove = 0;
-        moveList.getSelectionModel().select(actualMove);
-
-        for (;actualMove <= 0; actualMove--) chessGame.undo();
-        updateBoard();
+        while (actualMove >= 0) previousMove();
     }
 
 
@@ -397,6 +393,7 @@ public class Controller {
                     BoardField destField = chessGame.getBoard().getField(destCol, destRow);
 
                     String moveNonation = "" + (actFigure.getTyp() == Type.P ? "" : actFigure.getTyp()) + srcColChar + srcRow + dstColChar + destRow;
+                    String simpleMoveNotation = moveNonation;
                     if (actFigure.isWhite()) moveNonation = "" + ((actualMove / 2) + 1) + ". " + moveNonation + " ";
 
                     if (chessGame.move(actFigure, destField)) {
@@ -420,10 +417,13 @@ public class Controller {
                             }
                             moveList.getItems().add(actualMove / 2, newRecord);
                         }
+                        moveListColors.subList(actualMove, moveListColors.size()).clear();
+                        moveListColors.add(simpleMoveNotation);
 
                         moveList.getSelectionModel().select(actualMove / 2);
                         updateBoard();
                         canDoMove = !canDoMove;
+                        showPosition.setText("");
                     } else {
                         warningBar.setText("Non-valid move");
                         actualMove--;
@@ -444,7 +444,7 @@ public class Controller {
                         warningBar.setText("It is Black's turn");
                         return;
                     }
-                    delay.setText("" + srcColChar + srcRow);
+                    showPosition.setText("" + srcColChar + srcRow);
                     canDoMove = !canDoMove;
                 }
             }
@@ -454,55 +454,62 @@ public class Controller {
         }
     }
 
-
-        public void initialize() {
-            chessGame = createChessGame(new Board(8));  // create normal chess game
-
-            // only automatic or manual can be selected at once
-            ToggleGroup playGroup = new ToggleGroup();
-            playAutomaticaly.setToggleGroup(playGroup);
-            playManualy.setToggleGroup(playGroup);
-
-            playManualy.setSelected(true);  // turn on by default
-
-            // set to paused
-            setPauseOrPlay();
-
-            // init board buttons
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 8; y++) {
-                    Button button = new Button();
-                    GridPane.setConstraints(button, y, x);  // y = column, x = row
-
-                    // set color
-                    Color fieldColor = Color.web("#00000000");
-                    if ((x + y) % 2 == 0 ) fieldColor = Color.web("#FFFFFF");
-                    button.setBackground(new Background(new BackgroundFill(fieldColor, CornerRadii.EMPTY, Insets.EMPTY)));
-                    button.setMinWidth(100);
-                    button.setMinHeight(100);
-                    button.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override public void handle(ActionEvent e) {
-                            playerMove(button);
-                        }
-                    });
-                    button.setAccessibleText(""+ (y+1) + (x+1));
-                    fieldList.add(button);
-                    board.getChildren().add(button);
-
-                    //ColumnConstraints column1 = new ColumnConstraints();
-                    //column1.setPercentWidth(10);
-                    //board.getColumnConstraints().addAll(column1);
-                }
-            }
-            updateBoard();
-
-            /*
-            ColumnConstraints column1 = new ColumnConstraints();
-            column1.setPercentWidth(70);
-            ColumnConstraints column2 = new ColumnConstraints();
-            column2.setPercentWidth(30);
-            game.getColumnConstraints().addAll(column1, column2); // each get 50% of width*/
+    @FXML protected void resetPosition() {
+        if (canDoMove) {
+            showPosition.setText("");
+            canDoMove = !canDoMove;
         }
+    }
+
+
+    public void initialize() {
+        chessGame = createChessGame(new Board(8));  // create normal chess game
+
+        // only automatic or manual can be selected at once
+        ToggleGroup playGroup = new ToggleGroup();
+        playAutomaticaly.setToggleGroup(playGroup);
+        playManualy.setToggleGroup(playGroup);
+
+        playManualy.setSelected(true);  // turn on by default
+
+        // set to paused
+        setPauseOrPlay();
+
+        // init board buttons
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Button button = new Button();
+                GridPane.setConstraints(button, y, x);  // y = column, x = row
+
+                // set color
+                Color fieldColor = Color.web("#00000000");
+                if ((x + y) % 2 == 0 ) fieldColor = Color.web("#FFFFFF");
+                button.setBackground(new Background(new BackgroundFill(fieldColor, CornerRadii.EMPTY, Insets.EMPTY)));
+                button.setMinWidth(100);
+                button.setMinHeight(100);
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override public void handle(ActionEvent e) {
+                        playerMove(button);
+                    }
+                });
+                button.setAccessibleText(""+ (y+1) + (x+1));
+                fieldList.add(button);
+                board.getChildren().add(button);
+
+                //ColumnConstraints column1 = new ColumnConstraints();
+                //column1.setPercentWidth(10);
+                //board.getColumnConstraints().addAll(column1);
+            }
+        }
+        updateBoard();
+
+        /*
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setPercentWidth(70);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setPercentWidth(30);
+        game.getColumnConstraints().addAll(column1, column2); // each get 50% of width*/
+    }
 
 
 
