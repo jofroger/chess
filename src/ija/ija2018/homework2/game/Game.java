@@ -64,6 +64,73 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
         }
     }
 
+    @Override
+    public int oneStep (String step) {
+
+        String delims = "[ ]+";
+        String[] tokens = step.split(delims);
+
+        String figureTyp = "";
+        int rowAkt = 0;     // aktual row
+        int colAkt = 0;     // aktual col
+        int rowDest = 0;    // destination row
+        int colDest = 0;    // destination col
+        int f = 0;          // figurka cislo
+
+        if (tokens.length == 2) {
+
+            Figure figure;
+            Field field;
+            f = 0;
+            for (String token : tokens) {
+                f++;
+                if (Character.isUpperCase(token.codePointAt(0))) {
+                   figureTyp = token.substring(0,1);
+                   if (Character.isLowerCase(token.codePointAt(1)))
+                        colAkt = token.codePointAt(1)-96;
+                   if (Character.isDigit(token.codePointAt(2)))
+                        rowAkt = token.codePointAt(2)-48;
+
+                   if (Character.isLowerCase(token.codePointAt(3)))
+                        colDest = token.codePointAt(3)-96;
+                   if (Character.isDigit(token.codePointAt(4)))
+                        rowDest = token.codePointAt(4)-48;
+
+                }else {
+                    figureTyp = "P";
+                    if (Character.isLowerCase(token.codePointAt(0))) {
+//                        colAkt = Character.getNumericValue(Integer.parseInt(token.substring(0,1)))-96;
+                        colAkt = token.codePointAt(0)-96;
+                    }
+                    if (Character.isDigit(token.codePointAt(1)))
+                        rowAkt = token.codePointAt(1)-48;
+
+                    if (Character.isLowerCase(token.codePointAt(2)))
+                        colDest = token.codePointAt(2)-96;
+                    if (Character.isDigit(token.codePointAt(3)))
+                        rowDest = token.codePointAt(3)-48;
+
+                }
+
+                if (colAkt >= 1 && colAkt <=8 && rowAkt >= 1 && rowAkt <=8 &&
+                    colDest >= 1 && colDest <=8 && rowDest >= 1 && rowDest <=8) {
+
+                    figure = board.getField(colAkt, rowAkt).get();
+                    Disk d = (Disk) figure;
+                    if (figure == null) return 4;
+                    if (!d.getTyp().toString().equals(figureTyp)) return 6;
+                    field = board.getField(colDest, rowDest);
+                    if (!move(figure,field)) return 5;
+
+                }else if (f==1) return 2;
+                      else return 3;
+
+            }
+        } else return 1;
+
+        return 0;
+    }
+
     //Override Methods
     @Override
     public boolean move(Figure figure, Field field) {
