@@ -5,6 +5,10 @@ public class GameError {
     String name;
     Integer index;
 
+    /**
+     * @param name Popis chyby
+     * @param index poradove cislo chyby
+     */
     public GameError(String name, Integer index) {
         this.name = name;
         this.index = index;
@@ -18,6 +22,9 @@ public class GameError {
     public static final GameError ERR5 = new GameError("Procedura move skoncila chybou", 5);
     public static final GameError ERR6 = new GameError("Na policku je iny typ figurky", 6);
 
+    /**
+     * @return Navratova hodnota chyby
+     */
     @Override
     public String toString() {
         return name;

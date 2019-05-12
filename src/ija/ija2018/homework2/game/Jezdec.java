@@ -6,11 +6,18 @@ import ija.ija2018.homework2.common.Figure;
 public class Jezdec extends Disk{
 
     //Constructor
+    /**
+     * @param isWhite True/False Biela figurka
+     * @param col Riadok
+     * @param row Stlpec
+     */
     public Jezdec(boolean isWhite, int col, int row) {
         super(isWhite, Type.J, col, row);
         init();
     }
-
+    /**
+     * @note Pre dany typ figurky inicializuje zoznam moznych smerov
+     */
     private void init () {
         String up    = String.valueOf(Field.Direction.U);
         String down  = String.valueOf(Field.Direction.D);
@@ -36,6 +43,11 @@ public class Jezdec extends Disk{
         setGoodWay(cesty);
     }
 
+    /**
+     * @param moveTo Presun na policko
+     * @param game Hra
+     * @return Vrati ci dany pohyb figurky je realizovatelny True/False
+     */
     @Override
     public boolean moveValidation(Field moveTo, Game game) {
 

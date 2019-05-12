@@ -21,6 +21,10 @@ public class BoardField implements Field, Cloneable {
     public Field prevField;     //predchadzajuce pole
     public Field prevAktualField;     //predchadzajuce aktualne pole
 
+    /**
+     * @param col Stlpec hracej dosky
+     * @param row Riadok hracej dosky
+     */
     //Constructor
     public BoardField(int col, int row){
         this.row = row;
@@ -29,6 +33,11 @@ public class BoardField implements Field, Cloneable {
         this.cField = col-1;
     }
 
+    /**
+     * @param dirs Smer pohybu
+     * @param r Aktualny riadok
+     * @return Vrati novy riadok v zavislosti od smeru pohybu
+     */
     //Methods Homework1
     private int newRow (Direction dirs, int r) {
         String s;
@@ -46,6 +55,11 @@ public class BoardField implements Field, Cloneable {
         return r;
     }
 
+    /**
+     * @param dirs Smer pohybu
+     * @param c Aktualny stlpec
+     * @return Vrati novy stlpec v zavislosti od smeru pohybu
+     */
     private int newCol (Direction dirs, int c) {
         String s;
         for (int i = 0; i < dirs.toString().length(); i++) {
@@ -62,16 +76,28 @@ public class BoardField implements Field, Cloneable {
         return c;
     }
 
+    /**
+     * @return Vrati stlpec
+     */
     @Override
     public int getCol() {
         return this.col;
     }
 
+    /**
+     * @return Vrati riadok
+     */
     @Override
     public int getRow() {
         return this.row;
     }
 
+    /**
+     * @param col Stlpec
+     * @param row Riadok
+     * @param board Hracia doska
+     * @return Vrati hracie pole
+     */
     @Override
     public Field getField(int col, int row, Board board) {
         this.rField = row-1;
@@ -79,6 +105,11 @@ public class BoardField implements Field, Cloneable {
         return board.getField(cField, rField);
     }
 
+    /**
+     * @param dirs Smer pohybu
+     * @param field Pridava nove pole
+     * @param board Konkretna hracia doska
+     */
     @Override
     public void addNextField(Direction dirs, Field field, Board board) {
         c = newCol(dirs, this.cField);
@@ -88,6 +119,11 @@ public class BoardField implements Field, Cloneable {
     }
 
 
+    /**
+     * @param dirs Smer pohybu
+     * @param board Hracia doska
+     * @return Vrati nasledujuce pole
+     */
     @Override
     public Field nextField(Direction dirs, Board board) {
 
@@ -106,16 +142,18 @@ public class BoardField implements Field, Cloneable {
     }
 
 
+    /**
+     * @return Vrati ci hracie pole je prazdne
+     */
     @Override
     public boolean isEmpty() {
         return this.disk == null ? true : false;
     }
 
 
-
-
-
-
+    /**
+     * @return Vrati figurku hracieho pola
+     */
     //Methods
     @Override
     public Disk get() {
@@ -125,6 +163,10 @@ public class BoardField implements Field, Cloneable {
         } else return null;
     }
 
+    /**
+     * @param disk Figurka
+     * @return Polozi figurku na hracie pole
+     */
     @Override
     public boolean put(Disk disk) {
         if (isEmpty()) {
@@ -134,6 +176,10 @@ public class BoardField implements Field, Cloneable {
         } else return false;
     }
 
+    /**
+     * @param figure Vymaze figurku z hracieho pola
+     * @return
+     */
     @Override
     public boolean remove(Figure figure) {
         if (!isEmpty()) {

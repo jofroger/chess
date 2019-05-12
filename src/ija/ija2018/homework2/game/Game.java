@@ -9,6 +9,7 @@ import ija.ija2018.homework2.common.Figure;
  * @author Bali
  */
 
+
 public class Game extends GameFactory implements ija.ija2018.homework2.common.Game {
 
     public Game() {

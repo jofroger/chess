@@ -48,7 +48,11 @@ public class Disk implements Figure, Cloneable {
         return typ;
     }
 
-
+    /**
+     * @param moveTo Presun na policko
+     * @param game Hra
+     * @return Vrati ci dany pohyb figurky je realizovatelny True/False
+     */
     @Override
     public boolean moveValidation(Field moveTo, Game game) {
 
