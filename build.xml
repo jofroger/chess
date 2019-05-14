@@ -1,0 +1,29 @@
+<project>
+
+    <target name="clean">
+        <delete includeemptydirs="true">
+            <fileset dir="build" includes="**/*"/>
+        </delete>
+        <delete includeemptydirs="true">
+            <fileset dir="dest" includes="**/*"/>
+        </delete>
+    </target>
+
+    <target name="compile">
+        <javac srcdir="src" destdir="build"/>
+        <copy todir="build">
+            <fileset dir="src" excludes="**/*.java"/>
+        </copy>
+
+        <jar destfile="dest/ija-app.jar" basedir="build">
+            <manifest>
+                <attribute name="Main-Class" value="sample.Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run">
+        <java jar="dest/ija-app.jar" fork="true"/>
+    </target>
+
+</project>

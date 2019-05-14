@@ -5,22 +5,18 @@ import ija.ija2018.homework2.game.BoardField;
 import ija.ija2018.homework2.game.Disk;
 import ija.ija2018.homework2.game.Game;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
@@ -29,8 +25,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static ija.ija2018.homework2.GameFactory.createChessGame;
 import static ija.ija2018.homework2.common.Figure.*;
@@ -57,10 +51,8 @@ public class Controller {
     @FXML private TextField showPosition;
 
 
-
-
     // figure pictures
-    private String figurePath = "/figuresimg/";
+    private String figurePath = "/img/figuresimg/";
 
     private Image w_kral = new Image(getClass().getResourceAsStream(figurePath + "w_kral.png"));
     private Image w_dama = new Image(getClass().getResourceAsStream(figurePath +"w_dama.png"));
@@ -77,11 +69,10 @@ public class Controller {
     private Image b_pesiak = new Image(getClass().getResourceAsStream(figurePath +"b_pesiak.png"));
 
     // icon pictures
-    private String iconPath = "/icons/";
+    private String iconPath = "/img/icons/";
 
     private Image playIcon = new Image(getClass().getResourceAsStream(iconPath + "play.png"));
     private Image pauseIcon = new Image(getClass().getResourceAsStream(iconPath +"pause.png"));
-
 
 
 
@@ -90,6 +81,10 @@ public class Controller {
         return Arrays.asList(splitStr[1], splitStr[2]);      // chceme to bez poradovaho cisla
     }
 
+    /**
+     * Nacitava hru zo suboru
+     * @throws IOException
+     */
     @FXML protected void loadGame() throws IOException {
 
         FileChooser fileChooser = new FileChooser();
@@ -104,17 +99,6 @@ public class Controller {
             line = in.readLine();
         }
 
-
-
-
-        // todo metoda na nacitanie dat do ObservableList<String>
-        /* priklad */
-        /*ObservableList<String> moves = FXCollections.observableArrayList("1. h2h4 e7e6", "2. e2e4 e6e5", "3. Vh1h3 d7d6 ", "4. Sf1c4 Jb8c6");
-
-        for (String move : moves) {
-            moveList.getItems().add(move);
-            moveListColors.addAll(divByColor(move));
-        }*/
         moveList.getSelectionModel().select(actualMove);
 
         // rozmiestnenie figurok
@@ -122,9 +106,22 @@ public class Controller {
         updateBoard();
     }
 
-    @FXML protected void saveGame() {
+    /**
+     *  Uklada hru do suboru
+     * @throws IOException
+     */
+    @FXML protected void saveGame() throws IOException {
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showSaveDialog(root.getScene().getWindow());
+
+        if (selectedFile != null) {
+            PrintWriter writer;
+            writer = new PrintWriter(selectedFile);
+            for (String line : moveList.getItems()) {
+                writer.println(line);
+            }
+            writer.close();
+        }
     }
 
     private int charToIntRow(char row) {
@@ -175,6 +172,12 @@ public class Controller {
         }
     }
 
+    /**
+     *
+     * @param move
+     * @param isWhite
+     * @return
+     */
     private Pair<Disk, BoardField> getFigureAndFieldFromMove(String move, boolean isWhite) {
         Type figureType;
         int srcCol, srcRow, destCol, destRow;
@@ -234,7 +237,9 @@ public class Controller {
         return new Pair<>(figureToMove, destField);
     }
 
-
+    /**
+     * Vykona dalsi tah
+     */
     @FXML protected void nextMove() {
         if (actualMove < moveListColors.size() - 1) {   // pocitanie sa zacina od -1
             actualMove++;
@@ -252,6 +257,9 @@ public class Controller {
         }
     }
 
+    /**
+     * Vrati posledny tah
+     */
     @FXML protected void previousMove() {
         if (actualMove >= 0) {
             actualMove--;
@@ -261,8 +269,9 @@ public class Controller {
         }
     }
 
-    // change move by clicking to item in listview
-    // todo praca s moveList je vzdy nieco s dvojkou, poznacit v dokumentacii
+    /**
+     * Premiestni sa na vybrany tah
+     */
     @FXML public void handleMouseClick() {
         int destMove = moveList.getSelectionModel().getSelectedIndex() * 2;
 
@@ -274,11 +283,12 @@ public class Controller {
     }
 
 
-
+    /**
+     * Restartuje hru
+     */
     @FXML protected void restartGame() {
         while (actualMove >= 0) previousMove();
     }
-
 
     private void play() {
         Task task = new Task<Void>() {
@@ -304,7 +314,9 @@ public class Controller {
         new Thread(task).start();
     }
 
-
+    /**
+     * Zacne automaticky prehravat hru
+     */
     @FXML protected void playGameAutomatically() {
         if (paused) setPauseOrPlay();
         play();
@@ -378,6 +390,9 @@ public class Controller {
         }
     }
 
+    /**
+     * Stopne alebo spusti automaticke prehravanie hry
+     */
     @FXML protected void setPauseOrPlay() {
         if (paused) pauseOrPlay.setGraphic(new ImageView(pauseIcon));
         else  pauseOrPlay.setGraphic(new ImageView(playIcon));
@@ -385,8 +400,12 @@ public class Controller {
         paused = !paused;   // obrati hodnotu
     }
 
+    /**
+     * Prida novy tab
+     * @throws IOException
+     */
     @FXML protected void addNewTab() throws IOException {
-        TabPane pane = FXMLLoader.load(this.getClass().getResource("sample.fxml"));
+        TabPane pane = FXMLLoader.load(this.getClass().getResource("gui.fxml"));
 
         Tab newTab = new Tab("Game " + tabCnt);
         newTab.setContent(pane.getTabs().get(0).getContent());
@@ -477,6 +496,9 @@ public class Controller {
         }
     }
 
+    /**
+     * Je mozne opakovat tah
+     */
     @FXML protected void resetPosition() {
         if (canDoMove) {
             showPosition.setText("");
