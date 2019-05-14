@@ -86,24 +86,28 @@ public class Controller {
      * @throws IOException
      */
     @FXML protected void loadGame() throws IOException {
-
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showOpenDialog(root.getScene().getWindow());
 
-        BufferedReader in;
-        in = new BufferedReader(new FileReader(selectedFile));
-        String line = in.readLine();
-        while (line != null) {
-            moveList.getItems().add(line);
-            moveListColors.addAll(divByColor(line));
-            line = in.readLine();
+        if (selectedFile != null) {
+            moveList.getItems().clear();
+            moveListColors.clear();
+
+            BufferedReader in;
+            in = new BufferedReader(new FileReader(selectedFile));
+            String line = in.readLine();
+            while (line != null) {
+                moveList.getItems().add(line);
+                moveListColors.addAll(divByColor(line));
+                line = in.readLine();
+            }
+
+            moveList.getSelectionModel().select(actualMove);
+
+            // rozmiestnenie figurok
+            chessGame = createChessGame(new Board(8));
+            updateBoard();
         }
-
-        moveList.getSelectionModel().select(actualMove);
-
-        // rozmiestnenie figurok
-        chessGame = createChessGame(new Board(8));
-        updateBoard();
     }
 
     /**
@@ -390,6 +394,11 @@ public class Controller {
         }
     }
 
+    @FXML protected void redo() {
+        redo();
+    }
+
+
     /**
      * Stopne alebo spusti automaticke prehravanie hry
      */
@@ -439,7 +448,7 @@ public class Controller {
                     if (actFigure.isWhite()) moveNonation = "" + ((actualMove / 2) + 1) + ". " + moveNonation + " ";
 
                     if (chessGame.move(actFigure, destField)) {
-
+                        warningBar.setText(""+chessGame.getSach());
                         if (actFigure.isWhite()) {
                             moveList.getItems().remove(actualMove/2, moveList.getItems().size());
                             moveList.getItems().add(actualMove / 2, moveNonation);
@@ -468,6 +477,8 @@ public class Controller {
                         showPosition.setText("");
                     } else {
                         warningBar.setText("Non-valid move");
+                        warningBar.setText(""+chessGame.getSach());
+
                         actualMove--;
                     }
                 }

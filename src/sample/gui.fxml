@@ -115,7 +115,7 @@
                     <HBox   spacing="25"
                             alignment="center">
                         <Button text="Undo" onAction="#previousMove"/>
-                        <Button text="Redo" onAction="#nextMove"/>
+                        <Button text="Redo" onAction="#redo"/>
                     </HBox>
                     <HBox   spacing="10"
                             alignment="center">

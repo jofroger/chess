@@ -24,6 +24,9 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
     static boolean sach;
 
     //Methods
+    public boolean getSach() {
+        return sach;
+    }
 
     public Board getBoard() {
         return board;
