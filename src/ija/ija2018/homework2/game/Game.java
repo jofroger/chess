@@ -4,6 +4,9 @@ import ija.ija2018.homework2.GameFactory;
 import ija.ija2018.homework2.common.Field;
 import ija.ija2018.homework2.common.Figure;
 
+import java.util.HashMap;
+import java.util.Stack;
+
 /**
  *
  * @author Bali
@@ -22,6 +25,8 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
     private String gameName;
     static Field prevAktualField;
     static boolean sach;
+    private Stack< HashMap<String, Object> > undoStack = new Stack<>();
+
 
     //Methods
     public boolean getSach() {
@@ -150,6 +155,10 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
         destField = field;
         if (!figure.moveValidation(field,this)) return false;
 
+        // ulozi sa historia tahu
+        if (destField.get() == null) addMoveToUndo(figure, null, aktualField, destField);
+        else addMoveToUndo(figure, destField.get(), aktualField, destField);
+
 //        return figure.move(field,board,true);
         if (figure.move(field,board,true)) {
             prevAktualField = aktualField;
@@ -158,8 +167,39 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
         return false;
     }
 
-    @Override
+    private void addMoveToUndo(Figure movedFig, Figure takenFig, Field start, Field dest) {
+        HashMap<String, Object> undoMove = new HashMap<>();
+        undoMove.put("movedFig", movedFig);
+        undoMove.put("takenFig", takenFig);
+        undoMove.put("start", start);
+        undoMove.put("dest", dest);
+
+        this.undoStack.push(undoMove);
+    }
+
     public void undo() {
+        HashMap<String, Object> undoMove = this.undoStack.pop();
+        Figure movedFig = (Figure) undoMove.get("movedFig");
+        Figure takenFig = (Figure) undoMove.get("takenFig");
+        Field start = (Field) undoMove.get("start");
+        Field dest = (Field) undoMove.get("dest");
+
+        //movedFig.setPosition(start.getCoordinates());
+        Figure oldFigS = start.get();
+        if (oldFigS != null) start.remove(oldFigS);
+        start.put((Disk)movedFig);
+
+        Figure oldFigD = dest.get();
+        if (oldFigD != null) dest.remove(oldFigD);
+        if (takenFig != null) {
+            dest.put((Disk)takenFig);
+        }
+    }
+
+
+/*
+    @Override
+    public void undol() {
         Disk takeFigure;
         Figure figure;
         Field fieldPrev, field, takeField, fieldPrevAktual;
@@ -179,5 +219,5 @@ public class Game extends GameFactory implements ija.ija2018.homework2.common.Ga
         takeField.setTakeDisk(null);          //clear take disk
         takeField.setPrevField(null);         //clear previous field
         aktualField = fieldPrevAktual;
-    }
+    }*/
 }
